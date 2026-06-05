@@ -33,22 +33,18 @@ button:active{background:#1b76d8;}
         <button id="tab2" onclick="switchPrice(2)">价格表2</button>
     </div>
     <div class="box">
-        <label>客户姓名</label>
-        <input type="text" id="userName" placeholder="请输入姓名">
-    </div>
-    <div class="box">
-        <label>联系电话</label>
-        <input type="text" id="userPhone" placeholder="请输入手机号码">
-    </div>
-    <div class="box">
-        <label>收货地址</label>
-        <textarea id="userAddr" rows="2" placeholder="请输入详细收货地址"></textarea>
-    </div>
-    <div class="box">
         <label>输入商品序号（支持 6、6x2、6*2，空格/逗号分隔）</label>
         <input type="text" id="numInput" placeholder="示例：1 6x2 21*3">
         <div class="tip">支持空格、中英文逗号、混合分隔</div>
     </div>
+    <div class="box">
+        <label>搜索商品（输入部分名称）</label>
+        <div class="flex-row">
+            <input type="text" id="searchInput" placeholder="输入商品名称关键字">
+            <button onclick="searchGoods()" style="width:80px;margin-top:0;background:#27ae60;">搜索</button>
+        </div>
+    </div>
+    <div class="result" id="searchResult" style="display:none;"></div>
     <div class="flex-row">
         <div class="box">
             <label>单件统一优惠</label>
@@ -502,7 +498,7 @@ function getPrice(){
     let saleStr = priceExprArr.join("+")+"="+allTotal;
     nameText.value = nameShowArr.join("\n");
 
-    finalOrderText = `姓名：${userName}\n电话：${userPhone}\n地址：${userAddr}\n\n${numShowArr.join("，")}\n共${totalCount}包\n${saleStr}`;
+    finalOrderText = `${numShowArr.join("，")}\n共${totalCount}包\n${saleStr}`;
     resDom.innerText = errTip + finalOrderText;
 }
 
@@ -513,6 +509,28 @@ function copyOrder(){
     }).catch(()=>{
         alert("复制失败，请手动复制");
     });
+}
+
+function searchGoods(){
+    let keyword = document.getElementById("searchInput").value.trim().toLowerCase();
+    let resultDom = document.getElementById("searchResult");
+    if(!keyword){
+        resultDom.style.display = "none";
+        return;
+    }
+    let results = [];
+    for(let key in currentPriceData){
+        let item = currentPriceData[key];
+        if(item.name && item.name.toLowerCase().includes(keyword)){
+            results.push(`【${key}】${item.name} - ￥${item.price}`);
+        }
+    }
+    if(results.length > 0){
+        resultDom.innerText = "搜索结果：\n" + results.join("\n");
+    } else {
+        resultDom.innerText = "未找到包含「" + keyword + "」的商品";
+    }
+    resultDom.style.display = "block";
 }
 </script>
 </body>

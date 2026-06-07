@@ -62,6 +62,7 @@ button:active{background:#1b76d8;}
     <div class="result" id="showResult"></div>
     <button class="copy-btn" onclick="copyOrder()">一键复制整单信息</button>
 </div>
+
 <script>
 // ====================== 价格表1（原样不动） ======================
 const goodsData1 = {
@@ -93,7 +94,7 @@ const goodsData1 = {
 "26":{name:"粗支百乐酸奶爆",price:16},
 "27":{name:"",price:0},
 "28":{name:"粗支百乐蓝莓爆",price:16},
-"29":{name:"粗支百乐西瓜爆",price:0},
+"29":{name:"粗支百乐西瓜爆",price:16},
 "30":{name:"粗支百乐菠萝爆",price:16},
 "31":{name:"粗支百乐哈密瓜爆",price:16},
 "32":{name:"粗支百乐莫吉托爆",price:16},
@@ -146,7 +147,7 @@ const goodsData1 = {
 "81":{name:"细支米兰黑",price:10},
 "82":{name:"细支米兰白",price:10},
 "83":{name:"细支米兰绿",price:10},
-"85":{name:"细支关税黄鹤楼口红西瓜爆",price:0},
+"85":{name:"细支关税黄鹤楼口红西瓜爆",price:14},
 "86":{name:"细支关税黄鹤楼口红蓝莓",price:14},
 "87":{name:"细支关税黄鹤楼口红葡萄",price:14},
 "88":{name:"细支关税黄鹤楼口红水蜜桃",price:14},
@@ -159,7 +160,7 @@ const goodsData1 = {
 "95":{name:"支支关税口红和天下",price:14},
 "96":{name:"细支关税黄金叶口红天叶",price:15},
 "97":{name:"粗支日版七星软黑",price:13},
-"98":{name:"粗支日版七星软白",price:0},
+"98":{name:"粗支日版七星软白",price:15},
 "99":{name:"细支欧盟版卡比龙白",price:16},
 "100":{name:"细支欧盟版卡比龙黑",price:16},
 "101":{name:"",price:0},
@@ -194,7 +195,7 @@ const goodsData1 = {
 "130":{name:"粗支嘉年华芭乐爆",price:13},
 "131":{name:"中支大华桂花冰萃双爆",price:17},
 "132":{name:"中支大华茉莉白雪双爆",price:17},
-"133":{name:"中支关税黄鹤楼1916十五年",price:0},
+"133":{name:"中支关税黄鹤楼1916十五年",price:16},
 "134":{name:"",price:0},
 "135":{name:"中支关税黄鹤楼漫天游爆",price:16},
 "136":{name:"",price:0},
@@ -228,7 +229,9 @@ const goodsData1 = {
 "164":{name:"中支阿里山香芋柠檬爆",price:17},
 "165":{name:"中支阿里山哈密瓜爆",price:16},
 "166":{name:"中支阿里山冰桃双爆",price:15}
+
 };
+
 // ====================== 价格表2（你只改这里的price！） ======================
 const goodsData2 = {
 "01":{name:"百乐红酒",price:15},
@@ -426,38 +429,44 @@ const goodsData2 = {
 "195":{name:"阿里山玫瑰花",price:19},
 "196":{name:"阿里山薰衣草",price:19}
 };
+
 let currentPriceData = goodsData1;
 let finalOrderText = "";
-let activeTab = 1;
+
 function switchPrice(num){
     document.getElementById("tab1").classList.remove("active");
     document.getElementById("tab2").classList.remove("active");
     document.getElementById("tab"+num).classList.add("active");
-currentPriceData = num === 1 ? goodsData1 : goodsData2;
-    activeTab = num;
+    currentPriceData = num === 1 ? goodsData1 : goodsData2;
+
     document.getElementById("numInput").value = "";
     document.getElementById("goodsNameText").value = "";
     document.getElementById("showResult").innerText = "";
     finalOrderText = "";
 }
+
 function getPrice(){
     let inputVal = document.getElementById("numInput").value.trim();
     let discount = parseFloat(document.getElementById("discountInput").value) || 0;
     let resDom = document.getElementById("showResult");
     let nameText = document.getElementById("goodsNameText");
+
     if(!inputVal){
         resDom.innerText = "请输入商品序号！";
         nameText.value = "";
         return;
     }
+
     inputVal = inputVal.replace(/，/g, ",").replace(/\s+/g, ",").replace(/,+/g, ",");
     let items = inputVal.split(",");
+
     let priceExprArr = [];
     let nameShowArr = [];
     let numShowArr = [];
     let totalCount = 0;
     let allTotal = 0;
     let errTip = "";
+
     items.forEach(item=>{
         item = item.trim();
         if(!item) return;
@@ -483,14 +492,14 @@ function getPrice(){
             errTip += `序号${n}：无此商品\n`;
         }
     });
-//设置邮费
-    let postFee = activeTab ===1 ? 12 :15;
-    let finalTotal = allTotal + postFee;
-    let saleStr = priceExprArr.join("+")+"+运费"+postFee+"="+finalTotal;
+
+    let saleStr = priceExprArr.join("+")+"="+allTotal;
     nameText.value = nameShowArr.join("\n");
+
     finalOrderText = `${numShowArr.join("，")}\n共${totalCount}包\n${saleStr}`;
     resDom.innerText = errTip + finalOrderText;
 }
+
 function copyOrder(){
     if(!finalOrderText){alert("请先核算");return;}
     navigator.clipboard.writeText(finalOrderText).then(()=>{
@@ -499,29 +508,36 @@ function copyOrder(){
         alert("复制失败，请手动复制");
     });
 }
+
 function searchGoods(){
-    let keyword = document.getElementById("searchInput").value.trim().toLowerCase();
+    let keywords = document.getElementById("searchInput").value.trim().toLowerCase().split(/\s+/).filter(k => k);
     let resultDom = document.getElementById("searchResult");
-    if(!keyword){
+    if(!keywords.length){
         resultDom.style.display = "none";
         return;
     }
     let results = [];
-    for(let key in currentPriceData){
-        let item = currentPriceData[key];
-        if(item.name && item.name.toLowerCase().includes(keyword)){
-            results.push(`【${key}】${item.name} - ￥${item.price}`);
+    let foundSet = new Set();
+    
+    for(let keyword of keywords){
+        for(let key in currentPriceData){
+            let item = currentPriceData[key];
+            if(item.name && item.name.toLowerCase().includes(keyword)){
+                let result = `【${key}】${item.name} - ￥${item.price}`;
+                if(!foundSet.has(result)){
+                    foundSet.add(result);
+                    results.push(result);
+                }
+            }
         }
     }
     if(results.length > 0){
-        resultDom.innerText = "搜索结果：\n" + results.join("\n");
+        resultDom.innerText = "搜索结果（关键字：" + keywords.join("、") + "）：\n" + results.join("\n");
     } else {
-        resultDom.innerText = "未找到包含「" + keyword + "」的商品";
+        resultDom.innerText = "未找到包含「" + keywords.join("」或「") + "」的商品";
     }
     resultDom.style.display = "block";
 }
 </script>
 </body>
 </html>
-
-

@@ -431,6 +431,7 @@ const goodsData2 = {
 };
 
 let currentPriceData = goodsData1;
+let currentPriceTab = 1;
 let finalOrderText = "";
 
 function switchPrice(num){
@@ -438,6 +439,7 @@ function switchPrice(num){
     document.getElementById("tab2").classList.remove("active");
     document.getElementById("tab"+num).classList.add("active");
     currentPriceData = num === 1 ? goodsData1 : goodsData2;
+    currentPriceTab = num;
 
     document.getElementById("numInput").value = "";
     document.getElementById("goodsNameText").value = "";
@@ -494,9 +496,12 @@ function getPrice(){
     });
 
     let saleStr = priceExprArr.join("+")+"="+allTotal;
+    let shippingFee = currentPriceTab === 1 ? 12 : 15;
+    let totalWithShipping = allTotal + shippingFee;
+    
     nameText.value = nameShowArr.join("\n");
 
-    finalOrderText = `${numShowArr.join("，")}\n共${totalCount}包\n${saleStr}`;
+    finalOrderText = `${numShowArr.join("，")}\n共${totalCount}包\n${saleStr}+邮费${shippingFee}=${totalWithShipping}`;
     resDom.innerText = errTip + finalOrderText;
 }
 

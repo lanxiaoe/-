@@ -460,6 +460,11 @@ function getPrice(){
         return;
     }
 
+    if(inputVal === "0000"){
+        showAllGoods();
+        return;
+    }
+
     inputVal = inputVal.replace(/，/g, ",").replace(/\s+/g, ",").replace(/,+/g, ",");
     let items = inputVal.split(",");
 
@@ -504,6 +509,36 @@ function getPrice(){
 
     finalOrderText = `${numShowArr.join("，")}\n共${totalCount}包\n${saleStr}+邮费${shippingFee}=${totalWithShipping}`;
     resDom.innerText = errTip + finalOrderText;
+}
+
+function showAllGoods(){
+    let resDom = document.getElementById("showResult");
+    let nameText = document.getElementById("goodsNameText");
+    let discount = parseFloat(document.getElementById("discountInput").value) || 0;
+    let title = currentPriceTab === 1 ? "【价格表1】" : "【价格表2】";
+    let allGoods = [];
+    let nameList = [];
+    
+    let keys = Object.keys(currentPriceData).sort((a, b) => parseInt(a) - parseInt(b));
+    
+    keys.forEach(key => {
+        let item = currentPriceData[key];
+        if(item.name && item.name.trim()){
+            let salePrice = item.price - discount;
+            allGoods.push(`${key} ${item.name} - ￥${salePrice}`);
+            nameList.push(`${key} ${item.name}`);
+        }
+    });
+    
+    nameText.value = nameList.join("\n");
+    let discountTip = "";
+    if(discount > 0){
+        discountTip = `（单件优惠￥${discount}）`;
+    }else if(discount < 0){
+        discountTip = `（单件加价￥${Math.abs(discount)}）`;
+    }
+    finalOrderText = title + "所有商品加价表" + discountTip + "\n\n" + allGoods.join("\n");
+    resDom.innerText = finalOrderText;
 }
 
 function copyOrder(){
